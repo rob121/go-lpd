@@ -3,8 +3,8 @@ package lpd
 import (
 	"bufio"
 	"bytes"
-	"encoding/binary"
 	"errors"
+	"strconv"
 )
 
 const (
@@ -143,13 +143,7 @@ func unmarshalCommand(rawCommand []byte) (*command, error) {
 func marshalSubCommand(sbCmd *subCommand) []byte {
 	output := []byte{sbCmd.Code}
 
-	bNumBytes := make([]byte, 8)
-
-	binary.LittleEndian.PutUint64(bNumBytes, sbCmd.NumBytes)
-
-	for _, b := range bNumBytes {
-		output = append(output, b)
-	}
+	output = strconv.AppendUint(output, sbCmd.NumBytes, 10)
 
 	output = append(output, 0x20)
 
@@ -191,7 +185,11 @@ func unmarshalSubCommand(rawSubCommand []byte) (*subCommand, error) {
 		bNumBytes = bNumBytes[:len(bNumBytes)-1]
 	}
 
-	subCmd.NumBytes = binary.LittleEndian.Uint64(bNumBytes)
+	nbytes, err := strconv.Atoi(string(bNumBytes))
+	if err != nil {
+		return subCmd, nil
+	}
+	subCmd.NumBytes = uint64(nbytes)
 
 	fileName, _ := reader.ReadBytes(0x20)
 

@@ -1,9 +1,6 @@
 package lpd
 
-import (
-	"encoding/binary"
-	"testing"
-)
+import "testing"
 
 func TestMarshalCommand(t *testing.T) {
 	cmd := &command{
@@ -97,13 +94,11 @@ func TestMashalSubCommand(t *testing.T) {
 
 	i := 1
 
-	bNumBytes := make([]byte, 8)
-
-	binary.LittleEndian.PutUint64(bNumBytes, 10)
+	bNumBytes := []byte{0x31, 0x30}
 
 	for _, b := range bNumBytes {
 		if rawSubCommand[i] != b {
-			t.Fatal("Number of bytes not encoded correctly")
+			t.Fatalf("Number of bytes not encoded correctly '%x'", rawSubCommand)
 		}
 
 		i++
