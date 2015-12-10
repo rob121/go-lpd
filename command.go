@@ -49,7 +49,7 @@ func marshalCommand(cmd *command) []byte {
 		output = append(output, b)
 	}
 
-	output = append(output, 0x32)
+	output = append(output, 0x20)
 
 	bUsername := []byte(cmd.Username)
 
@@ -58,7 +58,7 @@ func marshalCommand(cmd *command) []byte {
 	}
 
 	for _, other := range cmd.Other {
-		output = append(output, 0x32)
+		output = append(output, 0x20)
 		for _, b := range other {
 			output = append(output, b)
 		}
@@ -86,13 +86,13 @@ func unmarshalCommand(rawCommand []byte) (*command, error) {
 		return cmd, nil
 	}
 
-	queueName, err := reader.ReadBytes(0x32)
+	queueName, err := reader.ReadBytes(0x20)
 
 	if len(queueName) < 1 {
 		return nil, errors.New("Command missing queue name")
 	}
 
-	if queueName[len(queueName)-1] == 0x32 {
+	if queueName[len(queueName)-1] == 0x20 {
 		queueName = queueName[:len(queueName)-1]
 	}
 
@@ -103,13 +103,13 @@ func unmarshalCommand(rawCommand []byte) (*command, error) {
 	}
 
 	if cmd.Code == RemoveJobs {
-		username, err := reader.ReadBytes(0x32)
+		username, err := reader.ReadBytes(0x20)
 
 		if len(username) < 1 {
 			return nil, errors.New("Command missing username")
 		}
 
-		if username[len(username)-1] == 0x32 {
+		if username[len(username)-1] == 0x20 {
 			username = username[:len(username)-1]
 		}
 
@@ -123,10 +123,10 @@ func unmarshalCommand(rawCommand []byte) (*command, error) {
 	cmd.Other = make([][]byte, 0)
 
 	for {
-		other, err := reader.ReadBytes(0x32)
+		other, err := reader.ReadBytes(0x20)
 
 		if len(other) > 0 {
-			if other[len(other)-1] == 0x32 {
+			if other[len(other)-1] == 0x20 {
 				other = other[:len(other)-1]
 			}
 
@@ -151,7 +151,7 @@ func marshalSubCommand(sbCmd *subCommand) []byte {
 		output = append(output, b)
 	}
 
-	output = append(output, 0x32)
+	output = append(output, 0x20)
 
 	bFileName := []byte(sbCmd.FileName)
 
@@ -181,25 +181,25 @@ func unmarshalSubCommand(rawSubCommand []byte) (*subCommand, error) {
 		return subCmd, nil
 	}
 
-	bNumBytes, err := reader.ReadBytes(0x32)
+	bNumBytes, err := reader.ReadBytes(0x20)
 
 	if len(bNumBytes) < 1 {
 		return nil, errors.New("Command missing number of bytes")
 	}
 
-	if bNumBytes[len(bNumBytes)-1] == 0x32 {
+	if bNumBytes[len(bNumBytes)-1] == 0x20 {
 		bNumBytes = bNumBytes[:len(bNumBytes)-1]
 	}
 
 	subCmd.NumBytes = binary.LittleEndian.Uint64(bNumBytes)
 
-	fileName, _ := reader.ReadBytes(0x32)
+	fileName, _ := reader.ReadBytes(0x20)
 
 	if len(fileName) < 1 {
 		return nil, errors.New("Command missing filename")
 	}
 
-	if fileName[len(fileName)-1] == 0x32 {
+	if fileName[len(fileName)-1] == 0x20 {
 		fileName = fileName[:len(fileName)-1]
 	}
 

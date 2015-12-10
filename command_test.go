@@ -30,7 +30,7 @@ func TestMarshalCommand(t *testing.T) {
 		i++
 	}
 
-	if rawCommand[i] != 0x32 {
+	if rawCommand[i] != 0x20 {
 		t.Fatal("Space not included after queue name")
 	}
 	i++
@@ -55,7 +55,7 @@ func TestUnmarshalCommand(t *testing.T) {
 		rawCommand = append(rawCommand, b)
 	}
 
-	rawCommand = append(rawCommand, 0x32)
+	rawCommand = append(rawCommand, 0x20)
 
 	bUsername := []byte("User")
 
@@ -109,7 +109,7 @@ func TestMashalSubCommand(t *testing.T) {
 		i++
 	}
 
-	if rawSubCommand[i] != 0x32 {
+	if rawSubCommand[i] != 0x20 {
 		t.Fatal("Space not included after number of bytes")
 	}
 
