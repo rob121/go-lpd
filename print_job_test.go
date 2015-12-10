@@ -45,14 +45,14 @@ func TestReceiveJob(t *testing.T) {
 		FileName: "test.pdf",
 	}
 
-	rawDataCmd := append(marshalSubCommand(dataCmd), 0x10)
+	rawDataCmd := append(marshalSubCommand(dataCmd), 0x0a)
 
 	controlCmd := &subCommand{
 		Code:     ReceiveControlFile,
 		NumBytes: 1,
 	}
 
-	rawControlCmd := append(marshalSubCommand(controlCmd), 0x10)
+	rawControlCmd := append(marshalSubCommand(controlCmd), 0x0a)
 
 	reader, receiveWrite := io.Pipe()
 	receiveRead, writer := io.Pipe()

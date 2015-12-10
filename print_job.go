@@ -50,7 +50,7 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 	for {
 		select {
 		default:
-			rawSubCommand, err := bufReader.ReadBytes(0x10)
+			rawSubCommand, err := bufReader.ReadBytes(0x0a)
 
 			if err != nil {
 				if job.ControlFile != nil && job.DataFile != nil {
