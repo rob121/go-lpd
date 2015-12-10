@@ -71,7 +71,7 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 				ackSubCommand(writer)
 				return nil, errors.New("job aborted")
 			case ReceiveControlFile:
-				cFile, err := readControlFile(reader, subCmd.NumBytes)
+				cFile, err := ReadControlFile(reader, subCmd.NumBytes)
 
 				if err != nil {
 					return nil, err
