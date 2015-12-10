@@ -79,7 +79,7 @@ func TestUnmarshalCommand(t *testing.T) {
 	}
 }
 
-func TestMashalSubCommand(t *testing.T) {
+func TestMarshalSubCommand(t *testing.T) {
 	subCmd := &subCommand{
 		Code:     0x2,
 		NumBytes: 10,
