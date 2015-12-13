@@ -34,7 +34,7 @@ func TestNewPrintJob(t *testing.T) {
 	}
 }
 
-func TestReceiveJob(t *testing.T) {
+func testReceiveJob(t *testing.T) {
 	dataFile := []byte{0x1}
 	// TODO: Replace this with proper control file
 	controlFile := []byte{0x1}

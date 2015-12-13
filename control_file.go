@@ -2,6 +2,7 @@ package lpd
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 )
 
@@ -15,6 +16,10 @@ type ControlFile struct {
 	PrintOptions []PrintOption
 
 	// get rid of options for now
+}
+
+func (c *ControlFile) String() string {
+	return fmt.Sprintf("<Hostname=\"%s\" User=\"%v\" JobName=\"%v\">", c.Hostname, c.User, c.JobName)
 }
 
 // AddOption ..

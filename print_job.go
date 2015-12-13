@@ -3,8 +3,10 @@ package lpd
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -14,6 +16,15 @@ type PrintJob struct {
 	QueueName   string
 	ControlFile *ControlFile
 	DataFile    *os.File
+}
+
+func (p *PrintJob) String() string {
+	return fmt.Sprintf("<Queue=\"%s\" ControlFile=\"%v\" DataFile=\"%v\">", p.QueueName, p.ControlFile, p.DataFile)
+}
+
+// GetFile return the data file
+func (p *PrintJob) GetFile() *os.File {
+	return p.DataFile
 }
 
 // NewPrintJob returns a PrintJob configured for a queue with a data file.
@@ -44,12 +55,14 @@ func NewPrintJob(queue string, dataFile io.Reader) (*PrintJob, error) {
 // Handle series of subcommands that describe a print job
 func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 	job := new(PrintJob)
+	var minibuff = []byte{0x0}
 
 	bufReader := bufio.NewReader(reader)
 
 	for {
 		select {
 		default:
+			fmt.Print("Yo")
 			rawSubCommand, err := bufReader.ReadBytes(0x0a)
 
 			if err != nil {
@@ -61,6 +74,14 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 			}
 
 			subCmd, err := unmarshalSubCommand(rawSubCommand)
+			if err != nil {
+				fmt.Println(err)
+				return nil, err
+			}
+			if subCmd.Code == 0x0 {
+				return nil, errors.New("Code Invalid\n")
+			}
+			fmt.Printf("\nsub : %v\n", subCmd.Code)
 
 			if err != nil {
 				return nil, err
@@ -71,25 +92,44 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 				ackSubCommand(writer)
 				return nil, errors.New("job aborted")
 			case ReceiveControlFile:
+				fmt.Println("Start RecCon")
+				ackSubCommand(writer)
 				cFile, err := ReadControlFile(reader, subCmd.NumBytes)
-
 				if err != nil {
 					return nil, err
 				}
 
+				_, err = reader.Read(minibuff)
+				if err != nil || minibuff[0] != 0x0 {
+					log.Fatal(err)
+				}
+
 				ackSubCommand(writer)
+				fmt.Print("Yo3")
 
 				job.ControlFile = cFile
+				fmt.Println("End RecCon")
 			case ReceiveDataFile:
+				fmt.Println("Start RecDat")
+				ackSubCommand(writer)
+
 				dataFile, err := readDataFile(reader, subCmd.NumBytes)
 
 				if err != nil {
 					return nil, err
 				}
+				_, err = reader.Read(minibuff)
+				if err != nil || minibuff[0] != 0x0 {
+					log.Fatal(err)
+				}
 
 				ackSubCommand(writer)
 
 				job.DataFile = dataFile
+
+				fmt.Println("End RecCon")
+
+				return job, nil
 			}
 		}
 	}
@@ -98,6 +138,17 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 // Send an octect of 0 to acknowledge a subcommand
 func ackSubCommand(writer io.Writer) error {
 	_, err := writer.Write([]byte{0x0})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Send an octect of 1 to refuse a subcommand
+func nackSubCommand(writer io.Writer) error {
+	_, err := writer.Write([]byte{0x1})
 
 	if err != nil {
 		return err

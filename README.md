@@ -34,6 +34,37 @@ func main() {
     return
   }
 
+
+  func handle(p lpd.PrintJob) {
+    fmt.Printf("RESULT = %v", p)
+
+    receivedFile := p.GetFile() // Receive file from "default" queue
+
+    defer receivedFile.Close()
+
+    saveFile, err := os.Create("/some/path")
+
+    if err != nil {
+      fmt.Println(err)
+      return
+    }
+
+    defer saveFile.Close()
+
+    _, err := io.Copy(saveFile, receivedFile) // Copy the temp file to a permanent save location
+
+    if err != nil {
+      fmt.Println(err)
+      return
+    }
+
+    fmt.Println("Printed file to: ", saveFile.Name())
+  }
+
+
+  server.HandleFunc("default", handle)
+  server.Serve()
+
   err := client.PrintFile(file, "default") // Print file to "default" queue
 
   if err != nil {
@@ -41,31 +72,7 @@ func main() {
     return
   }
 
-  receivedFile, err := server.ReceiveFile("default") // Receive file from "default" queue
 
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
 
-  defer receivedFile.Close()
-
-  saveFile, err := os.Create("/some/path")
-
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-
-  defer saveFile.Close()
-
-  _, err := io.Copy(saveFile, receivedFile) // Copy the temp file to a permanent save location
-
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-
-  fmt.Println("Printed file to: ", saveFile.Name())
 }
 ```
