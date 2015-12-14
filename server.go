@@ -61,7 +61,7 @@ func (s *Server) Serve() {
 		os.Exit(1)
 	}
 	defer l.Close()
-	fmt.Println("Listening on 0.0.0.0:5515")
+	// fmt.Println("Listening on 0.0.0.0:5515")
 
 	for {
 		// Listen for an incoming connection.
@@ -80,7 +80,7 @@ func (s *Server) processClient(conn net.Conn) {
 	defer conn.Close()
 	// writer := bufio.NewWriter(conn)
 	data, _ := reader.ReadBytes(0x0a)
-	fmt.Printf("Data recieved : %v\n", data)
+	// fmt.Printf("Data recieved : %v\n", data)
 
 	cmd, err := unmarshalCommand(data[:len(data)-1])
 	if err != nil {
@@ -98,7 +98,6 @@ func (s *Server) processClient(conn net.Conn) {
 		return
 	}
 
-	fmt.Println("Send ack")
 	ackSubCommand(conn)
 	// fmt.Printf("Bytes : %v Ok next...", b)
 

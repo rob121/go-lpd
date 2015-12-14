@@ -62,7 +62,7 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 	for {
 		select {
 		default:
-			fmt.Print("Yo")
+			// fmt.Print("Yo")
 			rawSubCommand, err := bufReader.ReadBytes(0x0a)
 
 			if err != nil {
@@ -75,13 +75,12 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 
 			subCmd, err := unmarshalSubCommand(rawSubCommand)
 			if err != nil {
-				fmt.Println(err)
 				return nil, err
 			}
 			if subCmd.Code == 0x0 {
 				return nil, errors.New("Code Invalid\n")
 			}
-			fmt.Printf("\nsub : %v\n", subCmd.Code)
+			// fmt.Printf("\nsub : %v\n", subCmd.Code)
 
 			if err != nil {
 				return nil, err
@@ -92,7 +91,7 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 				ackSubCommand(writer)
 				return nil, errors.New("job aborted")
 			case ReceiveControlFile:
-				fmt.Println("Start RecCon")
+				// fmt.Println("Start RecCon")
 				ackSubCommand(writer)
 				cFile, err := ReadControlFile(reader, subCmd.NumBytes)
 				if err != nil {
@@ -105,29 +104,36 @@ func receiveJob(reader io.Reader, writer io.Writer) (*PrintJob, error) {
 				}
 
 				ackSubCommand(writer)
-				fmt.Print("Yo3")
+				// fmt.Print("Yo3")
 
 				job.ControlFile = cFile
-				fmt.Println("End RecCon")
+				// fmt.Println("End RecCon")
 			case ReceiveDataFile:
-				fmt.Println("Start RecDat")
+				// fmt.Println("Start RecDat")
 				ackSubCommand(writer)
+				// fmt.Println("Start RecDat.")
 
 				dataFile, err := readDataFile(reader, subCmd.NumBytes)
+				// fmt.Println("Start RecDat..")
 
 				if err != nil {
 					return nil, err
 				}
+				// fmt.Println("Start RecDat...")
+				// fmt.Println(subCmd.NumBytes)
+
 				_, err = reader.Read(minibuff)
 				if err != nil || minibuff[0] != 0x0 {
 					log.Fatal(err)
 				}
+				// fmt.Println("Start RecDat....")
 
 				ackSubCommand(writer)
+				// fmt.Println("Start RecDat.....")
 
 				job.DataFile = dataFile
 
-				fmt.Println("End RecCon")
+				// fmt.Println("End RecCon")
 
 				return job, nil
 			}

@@ -26,13 +26,14 @@ func TestServer(t *testing.T) {
 		// server.Stop()
 		ch <- 1
 	}
-	server.HandleFunc("default", testHandle)
+	server.HandleFunc("LIVRET_A4", testHandle)
 
 	go func() {
 		server.Serve()
 	}()
 
 	go func() {
+		// time.Sleep(100 * time.Millisecond)
 		startClient(t, &clientState)
 	}()
 
@@ -47,7 +48,12 @@ func TestServer(t *testing.T) {
 func startClient(t *testing.T, s *string) {
 
 	// *s = "Connecting..."
-	conn, err := net.Dial("tcp", "127.0.0.1:5515")
+	var conn net.Conn
+	var err error
+
+	for conn == nil {
+		conn, err = net.Dial("tcp", "127.0.0.1:5515")
+	}
 	if err != nil {
 		t.Error(err)
 	}
@@ -141,7 +147,7 @@ func clientSendTCtrlFile(w io.Writer) error {
 // Send Recieve job Subcommand for DataFile
 func clientSendTSCmdData(w io.Writer) error {
 	rawCommand := []byte{0x3}
-	rawCommand = append(rawCommand, strconv.Itoa(8+2)...)
+	rawCommand = append(rawCommand, strconv.Itoa(8+1)...)
 	dec, _ := hex.DecodeString("206466413130317072696e74636c69656e7431320a")
 
 	rawCommand = append(rawCommand, dec...)
