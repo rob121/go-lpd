@@ -1,10 +1,13 @@
 package lpd
 
 import (
+	"bytes"
 	"encoding/hex"
 	"errors"
 	"io"
+	"io/ioutil"
 	"net"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -24,6 +27,17 @@ func TestServer(t *testing.T) {
 
 	testHandle := func(p PrintJob) {
 		// server.Stop()
+		defer os.Remove(p.DataFile.Name())
+		original, _ := hex.DecodeString("497420776f726b730a")
+		p.DataFile.Seek(0, 0)
+		buff, err := ioutil.ReadAll(p.DataFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+		comp := bytes.Equal(buff, original)
+		if !comp {
+			t.Fatal("Not Equal")
+		}
 		ch <- 1
 	}
 	server.HandleFunc("LIVRET_A4", testHandle)

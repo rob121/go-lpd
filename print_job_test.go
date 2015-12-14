@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"os"
 	"testing"
 	"time"
 )
@@ -12,6 +13,7 @@ func TestNewPrintJob(t *testing.T) {
 	file := bytes.NewReader([]byte{0x1})
 
 	job, err := NewPrintJob("test", file)
+	defer os.Remove(job.DataFile.Name())
 
 	if err != nil {
 		t.Fatal(err)
