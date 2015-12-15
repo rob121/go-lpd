@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 )
 
 // QueueHandler is an interface like http handler
@@ -55,7 +56,7 @@ func NewServer(port int) (*Server, error) {
 // Serve our requests
 func (s *Server) Serve() {
 	// Listen for incoming connections.
-	l, err := net.Listen("tcp", "0.0.0.0:5515")
+	l, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(s.port))
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
