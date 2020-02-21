@@ -107,6 +107,8 @@ func (s *Server) processClient(conn net.Conn) {
 		panic(err)
 	}
 
+	job.QueueName = cmd.Queue
+	
 	// fmt.Printf("Job Recieved : %v", job)
 	s.queues[cmd.Queue].ProcessJob(*job)
 
