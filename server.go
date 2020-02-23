@@ -104,7 +104,8 @@ func (s *Server) processClient(conn net.Conn) {
 
 	job, err := receiveJob(conn, conn)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	job.QueueName = cmd.Queue
