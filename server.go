@@ -84,6 +84,9 @@ func (s *Server) processClient(conn net.Conn) {
 	// fmt.Printf("Data recieved : %v\n", data)
 
 	cmd, err := unmarshalCommand(data[:len(data)-1])
+	
+	log.Println(cmd)
+	
 	if err != nil {
 		log.Fatal("Can't unmarshal")
 	}
